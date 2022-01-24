@@ -1,16 +1,16 @@
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
 ARG WINE_VERSION=winehq-staging
-ARG PYTHON_VERSION=3.7.5
-ARG PYINSTALLER_VERSION=3.6
+ARG PYTHON_VERSION=3.9.6
+ARG PYINSTALLER_VERSION=4.8
 
 # we need wine for this all to work, so we'll use the PPA
 RUN set -x \
     && dpkg --add-architecture i386 \
     && apt-get update -qy \
-    && apt-get install --no-install-recommends -qfy apt-transport-https software-properties-common wget \
+    && apt-get install --no-install-recommends -qfy apt-transport-https software-properties-common wget gpg-agent rename \
     && wget -nv https://dl.winehq.org/wine-builds/winehq.key \
     && apt-key add winehq.key \
     && add-apt-repository 'https://dl.winehq.org/wine-builds/ubuntu/' \
@@ -71,6 +71,9 @@ RUN set -x \
 
 # install pyinstaller
 RUN /usr/bin/pip install pyinstaller==$PYINSTALLER_VERSION
+
+# install mysql
+RUN apt-get install -qy libmariadb3 libmariadb-dev
 
 # put the src folder inside wine
 RUN mkdir /src/ && ln -s /src /wine/drive_c/src
